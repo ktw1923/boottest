@@ -1,0 +1,19 @@
+
+¢
+java:S1488x"_Immediately return this expression instead of assigning it to the temporary variable "itemDTO".(Ž÷’•8ÑÄ«ƒ‰2J$a69dd569-03ba-4e89-a1e5-b1457968e2d7
+½
+java:S62047"zReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.(úùØ°8ÖÄ«ƒ‰2J$c161a6d8-71c5-4081-a343-ddd69d8605ed
+o
+java:S1602O",Remove useless curly braces around statement(åË¥é8ÚÄ«ƒ‰2J$eb6f02b0-0093-4059-bd49-064ac543708d
+„
+java:S1612O"AReplace this lambda with method reference 'item::addImageString'.(åË¥é8ÚÄ«ƒ‰2J$10d85b31-7f9d-4a2a-a9e4-bd496fb3879e
+†
+java:S1612i"CReplace this lambda with method reference 'ItemImage::getFileName'.(•©½€8ÝÄ«ƒ‰2J$8fc143e5-92ee-4efc-a144-c419308f8c33
+‚
+java:S1155">Use isEmpty() to check whether the collection is empty or not.(Ø¤‰Ã8áÄ«ƒ‰2J$de9f9e2b-92f6-4b74-8ee8-759ded92f71f
+p
+java:S1602Ž",Remove useless curly braces around statement(¨”µç8âÄ«ƒ‰2J$b66ac097-7ddb-4c04-a3e5-4cadfa124eb7
+…
+java:S1612Ž"AReplace this lambda with method reference 'item::addImageString'.(¨”µç8âÄ«ƒ‰2J$1c8b0e81-1e69-482d-8d60-a655f7814142
+€
+java:S1128"8Remove this unused import 'java.util.stream.Collectors'.(Óóº´úÿÿÿÿ8¹×³„‰2J$398afc10-0210-4e53-bd5e-8fc8726f397e

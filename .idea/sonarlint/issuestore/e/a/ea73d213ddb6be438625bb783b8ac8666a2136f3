@@ -1,0 +1,7 @@
+
+†
+java:S1155O">Use isEmpty() to check whether the collection is empty or not.(ÉÜÌŸýÿÿÿÿ8Ç°ûƒ‰2J$d9ecac26-a820-4880-965e-a757f5ae90e4
+†
+java:S1155U">Use isEmpty() to check whether the collection is empty or not.(Ä¹Ë³ÿÿÿÿÿ8Ç°ûƒ‰2J$2c83a32d-d67b-4dd8-9a77-18feb728af6b
+Â
+java:S6204X"zReplace this usage of 'Stream.collect(Collectors.toList())' with 'Stream.toList()' and ensure that the list is unmodified.(ƒ°Ü”þÿÿÿÿ8Ç°ûƒ‰2J$1359d368-0121-47ac-ab8d-ef1875332c2d
