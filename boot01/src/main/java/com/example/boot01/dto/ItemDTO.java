@@ -1,19 +1,13 @@
 package com.example.boot01.dto;
 
-
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import java.util.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @Builder
-@AllArgsConstructor  //모든 필드를 파라미터로 가지는 생성자를 자동으로 생성
-@NoArgsConstructor  //파라미터로 없는 기본 생성자를 자동으로 생성
+@AllArgsConstructor
+@NoArgsConstructor
 public class ItemDTO {
 
     private Long pnum;
@@ -24,13 +18,12 @@ public class ItemDTO {
 
     private String pdesc;
 
-    private boolean pflag;
+    private boolean deFlag;
 
     @Builder.Default
-    private List<MultipartFile> files= new ArrayList<>();
+    private List<MultipartFile> files = new ArrayList<>();
 
     @Builder.Default
-    private List<String> fileNames=new ArrayList<>();
-
+    private List<String> uploadFileNames = new ArrayList<>();
 
 }

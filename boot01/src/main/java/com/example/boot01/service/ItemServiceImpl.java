@@ -1,12 +1,9 @@
 package com.example.boot01.service;
 
-import com.example.boot01.dto.ItemDTO;
-import com.example.boot01.dto.PageDTO;
-import com.example.boot01.dto.PageDTO2;
-import com.example.boot01.entity.Item;
-import com.example.boot01.entity.ItemImage;
+import com.example.boot01.dto.*;
 import com.example.boot01.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,133 +15,154 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.toList;
-
 @Service
+@Log4j2
 @RequiredArgsConstructor
 @Transactional
-public class ItemServiceImpl implements ItemService{
+public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
 
     @Override
     public PageDTO2<ItemDTO> getList(PageDTO pageDTO) {
 
+
         Pageable pageable = PageRequest.of(
-                pageDTO.getPage()-1,
-                pageDTO.getNum(),
+                pageDTO.getPage() - 1,  //페이지 시작 번호가 0부터 시작하므로
+                pageDTO.getSize(),
                 Sort.by("pnum").descending());
 
-        Page<Object[]> result = itemRepository.selectList(pageable); //item, imgList
+        Page<Object[]> result = itemRepository.selectList(pageable);
+
 
         List<ItemDTO> dtoList = result.get().map(arr -> {
-            Item item = (Item) arr[0]; //상품
-            ItemImage itemImage = (ItemImage) arr[1]; //상품 이미지
 
-            ItemDTO itemDTO=ItemDTO.builder()
+            Item item = (Item) arr[0]; //상품
+            ItemImage itemImage = (ItemImage) arr[1]; //상품이미지
+
+            ItemDTO itemDTO = ItemDTO.builder()
                     .pnum(item.getPnum())
                     .pname(item.getPname())
                     .pdesc(item.getPdesc())
                     .price(item.getPrice())
                     .build();
 
-            String imageString = itemImage.getFileName();
-            itemDTO.setFileNames(List.of(imageString)); //이미지 문자열은 디비에 삽입
+            String imageStr = itemImage.getFileName();
+            itemDTO.setUploadFileNames(List.of(imageStr));
+            // 이미지 문자ㅓ열은 디비에 있는값이라고 생각..
 
             return itemDTO;
-        }).collect(toList()); //리스트 변환
+        }).collect(Collectors.toList());
 
         long totalCount = result.getTotalElements();
 
         return PageDTO2.<ItemDTO>withAll()
-                .dtoList(dtoList) //item, itemImage
-                .total(totalCount)
+                .dtoList(dtoList)
+                .totalCount(totalCount)
                 .pageDTO(pageDTO)
                 .build();
-
     }
 
-    private Item dtoToEntity(ItemDTO itemDTO) {
+    @Override
+    public Long register(ItemDTO itemDTO) {
+
+        Item item = dtoToEntity(itemDTO);
+
+        Item result = itemRepository.save(item);
+
+        return result.getPnum();
+    }
+    private Item dtoToEntity(ItemDTO itemDTO){
+
         Item item = Item.builder()
                 .pnum(itemDTO.getPnum())
                 .pname(itemDTO.getPname())
                 .pdesc(itemDTO.getPdesc())
                 .price(itemDTO.getPrice())
-                .pflag(itemDTO.isPflag())
                 .build();
 
-        //업로드 끝난 파일명들의 리스트
-        List<String> upFileNames = itemDTO.getFileNames();
+        //업로드 처리가 끝난 파일들의 이름 리스트
+        List<String> uploadFileNames = itemDTO.getUploadFileNames();
 
-        upFileNames.stream().forEach(uploadNames -> {
-            item.addImageString(uploadNames);
+        if(uploadFileNames == null){
+            return item;
+        }
+
+        uploadFileNames.stream().forEach(uploadName -> {
+            item.addImgString(uploadName);
         });
 
         return item;
     }
-
-    @Override
-    public Long register(ItemDTO itemDTO) {
-        Item item = dtoToEntity(itemDTO);
-        itemRepository.save(item); // Save the item to the repository
-        return item.getPnum(); // Return the generated ID
-    }
-
-    private ItemDTO entityToDTO(Item item) {
+    private ItemDTO entityToDTO(Item item){
 
         ItemDTO itemDTO = ItemDTO.builder()
                 .pnum(item.getPnum())
                 .pname(item.getPname())
                 .pdesc(item.getPdesc())
                 .price(item.getPrice())
-                .pflag(item.isPflag())
+                .deFlag(item.isDeFlag())
                 .build();
 
-        List<ItemImage> itemImages = item.getImgList();
 
-        List<String> fileName = itemImages.stream().map(itemImage ->
-            itemImage.getFileName()).toList();
+        List<ItemImage> imageList = item.getImgList();
 
-            itemDTO.setFileNames(fileName);
-
+        if(imageList == null || imageList.size() == 0 ){
             return itemDTO;
-    }
+        }
 
+        List<String> fileNameList = imageList.stream().map(productImage ->
+                productImage.getFileName()).toList();
+
+        itemDTO.setUploadFileNames(fileNameList);
+
+        return itemDTO;
+    }
     @Override
     public ItemDTO get(Long pnum) {
 
-        Optional<Item> optional = itemRepository.selectOne(pnum);
+        Optional<Item> result = itemRepository.selectOne(pnum);
 
-        Item item = optional.orElseThrow();
+        Item item = result.orElseThrow();
 
-        ItemDTO itemDTO = entityToDTO(item); //entity(Item) -> dto(ItemDTO)
+        ItemDTO itemDTO = entityToDTO(item);
 
         return itemDTO;
+
     }
 
     @Override
     public void modify(ItemDTO itemDTO) {
-        //상품 조회 후
-        Optional<Item> optional=itemRepository.findById(itemDTO.getPnum());
 
-        Item item = optional.orElseThrow();
 
-        item.setPname(itemDTO.getPname());
-        item.setPdesc(itemDTO.getPdesc());
-        item.setPrice(itemDTO.getPrice());
+        //step1 read  조회
+        Optional<Item> result = itemRepository.findById(itemDTO.getPnum());
 
-        //이미지 처리하기 위해 비워놔야 한다
-        item.clearImage();
+        Item item = result.orElseThrow();
 
-        List<String> upFileNames = itemDTO.getFileNames();
+        //change pname, pdesc, price 변경내용 반영
+        item.chName(itemDTO.getPname());
+        item.chDesc(itemDTO.getPdesc());
+        item.chPrice(itemDTO.getPrice());
 
-        if(upFileNames!=null && upFileNames.size()>0) {
-            upFileNames.stream().forEach(uploadName -> {
-                item.addImageString(uploadName);
+        //upload File -- clear first
+        //이미지처리하기 위해 목록 비워놔야한다
+        item.clearList();
+
+        List<String> uploadFileNames = itemDTO.getUploadFileNames();
+
+        if(uploadFileNames != null && uploadFileNames.size() > 0 ){
+            uploadFileNames.stream().forEach(uploadName -> {
+                item.addImgString(uploadName);
             });
         }
-
-        itemRepository.save(item); // Save the item to the repository
-
+        itemRepository.save(item);
     }
+
+    @Override
+    public void delete(Long pnum) {
+        itemRepository.updateToDelete(pnum, true);
+    }
+
+
 }

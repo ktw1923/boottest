@@ -7,15 +7,14 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @Data
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class PageDTO {
 
     @Builder.Default
-    private int page=1;
-
+    private int page = 1;
 
     @Builder.Default
-    private int num=10;
+    private int size = 10;
 }
